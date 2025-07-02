@@ -1,5 +1,6 @@
 package com.etsong.questions.service.impl;
 
+import com.etsong.common.core.domain.R;
 import com.etsong.questions.domain.Topic;
 import com.etsong.questions.service.QuestionService;
 import com.github.pagehelper.Page;
@@ -28,7 +29,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @return 分页结果
      */
     @Override
-    public Page<Topic> getQuestionByPage(Integer pageNum, Integer pageSize) {
+    public R<Page<Topic>> getQuestionByPage(Integer pageNum, Integer pageSize) {
         int page = (pageNum != null && pageNum > 0) ? pageNum : 1;
         int size = (pageSize != null && pageSize > 0) ? pageSize : 6;
 
@@ -47,6 +48,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         log.info("分页查询结果：{}", pageObj);
         
-        return pageObj;
+        // 返回封装后的结果
+        return R.ok(pageObj);
     }
 }

@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import { submitAnswers,getResult,getQuestionByPage } from "@/api/questions/topic";
+import { submitAnswers, getResult, getQuestionByPage } from "@/api/questions/topic";
 
 export default {
   name: "TestPage",
@@ -177,16 +177,29 @@ export default {
     /** 查询当前页题目 */
     getList() {
       this.loading = true;
-      // 修复：将 queryParams 拆解为 pageNum 和 pageSize 作为独立参数传入
+
       getQuestionByPage(this.queryParams.pageNum, this.queryParams.pageSize)
         .then(response => {
-          // 关联已保存的答案
-          this.topicList = response.rows.map(question => ({
+          // 使用后端返回的分页数据
+          const pageSize = this.queryParams.pageSize;
+          const pageNum = this.queryParams.pageNum;
+          console.log("response:",response);
+
+          const total = response.length; // 总题数
+          const start = (pageNum - 1) * pageSize;
+          const end = start + pageSize;
+          const paginatedData = response.slice(start, end);
+
+          // 赋值给 topicList 并关联答案
+          this.topicList = paginatedData.map(question => ({
             ...question,
             userScore: this.answerMap[question.topicId] || null
           }));
-          this.totalQuestions = response.total;
-          this.totalPages = Math.ceil(this.totalQuestions / this.queryParams.pageSize);
+
+          // 更新总题数和总页数
+          this.totalQuestions = total;
+          this.totalPages = Math.ceil(total / pageSize);
+
           this.loading = false;
         })
         .catch(error => {
