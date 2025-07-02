@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 命名空间需与Mapper接口全路径一致 -->
+<mapper namespace="com.etsong.questions.mapper.QuestionMapper">
+
+    <!-- 定义结果集映射（映射数据库字段与实体类属性） -->
+    <resultMap id="TopicResultMap" type="com.etsong.questions.domain.Topic">
+        <id column="topic_id" property="topicId"/>
+        <result column="topic_content" property="topicContent"/>
+        <result column="prototype_id" property="prototypeId"/>
+    </resultMap>
+
+    <!-- 分页查询题目（对应selectPage方法） -->
+    <select id="selectPage" resultMap="TopicResultMap">
+        <!-- RowBounds会自动处理offset和limit，此处无需手动添加 -->
+        SELECT topic_id, topic_content, prototype_id
+        FROM topic
+        ORDER BY topic_id ASC  <!-- 按题目ID排序，确保分页顺序一致 -->
+    </select>
+
+    <!-- 查询总记录数（对应countAll方法） -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM topic
+    </select>
+
+</mapper>
