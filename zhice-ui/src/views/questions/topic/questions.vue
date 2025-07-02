@@ -29,11 +29,10 @@
         <div class="title-container">
           <h3>原型探索量表</h3>
           <p>共 {{ totalQuestions }} 题 · 每页6题 · 请根据实际情况选择</p>
-          <el-progress
-            :percentage="progress"
-            stroke-width="6"
-            style="margin: 10px 0;"
-          ></el-progress>
+          <el-progress :percentage="progress"
+          :stroke-width="6"
+          style="margin: 10px 0;">
+          </el-progress>
           <p class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</p>
         </div>
       </el-col>
@@ -128,28 +127,21 @@ export default {
   name: "TestPage",
   data() {
     return {
-      // 基础参数
       loading: false,
       submitting: false,
       showAlert: false,
       showSuccess: false,
-      totalQuestions: 72, // 总题数
-      totalPages: 12, // 总页数72/6
+      totalQuestions: 0,
+      totalPages: 0,
       currentPage: 1,
-      recordId: null, // 提交后返回的记录ID
-
-      // 题目数据
-      topicList: [], // 当前页题目列表
+      recordId: null,
+      topicList: [],
       queryParams: {
         pageNum: 1,
         pageSize: 6,
-        prototypeId: null // 题目类别（预留筛选字段）
+        prototypeId: null
       },
-
-      // 答案存储
-      answerMap: {}, // { topicId: score }
-
-      // 分数选项
+      answerMap: {},
       scoreOptions: [
         { value: 1, desc: "从来没有" },
         { value: 2, desc: "很少" },
@@ -160,13 +152,11 @@ export default {
     };
   },
   computed: {
-    // 进度百分比
     progress() {
-      return (this.currentPage / this.totalPages) * 100;
+      return this.totalPages > 0 ? Math.min(100, (this.currentPage / this.totalPages) * 100) : 0;
     }
   },
   created() {
-    // 从本地存储恢复答案
     const savedAnswers = localStorage.getItem("testAnswers");
     if (savedAnswers) {
       this.answerMap = JSON.parse(savedAnswers);
@@ -175,43 +165,44 @@ export default {
   },
   methods: {
     /** 查询当前页题目 */
-    getList() {
-      this.loading = true;
+    async getList() {
+  this.loading = true;
+  try {
+    const response = await getQuestionByPage(this.currentPage, this.queryParams.pageSize);
+    console.log('接口返回:', response); // 👈 调试用
+    console.log('接口数据:', response);
 
-      getQuestionByPage(this.queryParams.pageNum, this.queryParams.pageSize)
-        .then(response => {
-          // 使用后端返回的分页数据
-          const pageSize = this.queryParams.pageSize;
-          const pageNum = this.queryParams.pageNum;
-          console.log("response:",response);
+    console.log('接口数据:', response.list);
+    const pageData = response.data;
+    console.log('分页数据:', pageData); // 👈 调试用
 
-          const total = response.length; // 总题数
-          const start = (pageNum - 1) * pageSize;
-          const end = start + pageSize;
-          const paginatedData = response.slice(start, end);
+    if (!pageData || !Array.isArray(pageData.list)) {
+      this.$message.error('接口数据格式错误');
+      return;
+    }
 
-          // 赋值给 topicList 并关联答案
-          this.topicList = paginatedData.map(question => ({
-            ...question,
-            userScore: this.answerMap[question.topicId] || null
-          }));
+    // 设置题目列表及答案状态
+    this.topicList = pageData.list.map(question => ({
+      ...question,
+      userScore: this.answerMap[question.topicId] || null
+    }));
 
-          // 更新总题数和总页数
-          this.totalQuestions = total;
-          this.totalPages = Math.ceil(total / pageSize);
+    // 更新总题数和总页数
+    this.totalQuestions = pageData.total;
+    this.totalPages = pageData.pages;
+    this.queryParams.pageNum = this.currentPage;
 
-          this.loading = false;
-        })
-        .catch(error => {
-          this.$message.error("题目加载失败，请重试");
-          this.loading = false;
-        });
-    },
+  } catch (error) {
+    console.error('加载失败:', error);
+    this.$message.error("题目加载失败，请重试");
+  } finally {
+    this.loading = false;
+  }
+},
 
     /** 处理答案选择 */
     handleAnswerChange(topicId, score) {
-      this.answerMap[topicId] = score;
-      // 保存到本地存储
+      this.$set(this.answerMap, topicId, score); // 使用$set确保响应式
       localStorage.setItem("testAnswers", JSON.stringify(this.answerMap));
     },
 
@@ -219,7 +210,6 @@ export default {
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
-        this.queryParams.pageNum = this.currentPage;
         this.getList();
         window.scrollTo(0, 0);
       }
@@ -227,25 +217,21 @@ export default {
 
     /** 下一页或提交 */
     nextOrSubmit() {
-      // 检查当前页是否全部答题
-      const allAnswered = this.topicList.every(question =>
-        question.userScore !== null && question.userScore !== undefined
-      );
+      // 检查当前页是否所有题目都已作答
+      const currentPageQuestions = this.topicList;
+      const allAnswered = currentPageQuestions.every(q => q.userScore !== null && q.userScore !== undefined);
 
       if (!allAnswered) {
         this.showAlert = true;
         return;
       }
 
-      // 最后一页提交
-      if (this.currentPage === this.totalPages) {
+      if (this.currentPage >= this.totalPages) {
         this.submitAnswers();
         return;
       }
 
-      // 下一页
       this.currentPage++;
-      this.queryParams.pageNum = this.currentPage;
       this.getList();
       window.scrollTo(0, 0);
     },
@@ -253,25 +239,25 @@ export default {
     /** 提交所有答案 */
     submitAnswers() {
       this.submitting = true;
-      // 构造提交数据
       const answerList = Object.entries(this.answerMap).map(([topicId, score]) => ({
         topicId: parseInt(topicId),
         score: parseInt(score)
       }));
 
-      submitAnswers({ answers: answerList }).then(response => {
-        this.recordId = response.data.recordId;
-        this.showSuccess = true;
-        // 清除本地存储
-        localStorage.removeItem("testAnswers");
-      }).catch(error => {
-        this.$message.error("提交失败，请重试");
-      }).finally(() => {
-        this.submitting = false;
-      });
+      submitAnswers({ answers: answerList })
+        .then(response => {
+          this.recordId = response.data.recordId;
+          this.showSuccess = true;
+          localStorage.removeItem("testAnswers");
+        })
+        .catch(() => {
+          this.$message.error("提交失败，请重试");
+        })
+        .finally(() => {
+          this.submitting = false;
+        });
     },
 
-    /** 前往结果页 */
     toResultPage() {
       this.$router.push({
         path: "/result",
@@ -279,18 +265,19 @@ export default {
       });
     },
 
-    /** 搜索与重置（预留方法，保持接口一致） */
     handleQuery() {
-      this.queryParams.pageNum = 1;
+      this.currentPage = 1;
       this.getList();
     },
+
     resetQuery() {
       this.queryParams = {
         pageNum: 1,
         pageSize: 6,
         prototypeId: null
       };
-      this.handleQuery();
+      this.currentPage = 1;
+      this.getList();
     }
   }
 };

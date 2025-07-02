@@ -52,12 +52,6 @@ export function getQuestionByPage(pageNum,pageSize=6){
       pageNum,
       pageSize
     }
-  }).then(res => {
-    // 处理统一结果封装
-    if (res && res.data) {
-      return Promise.resolve(res.data);
-    }
-    return Promise.reject(new Error('数据解析失败'));
   })
 }
 
