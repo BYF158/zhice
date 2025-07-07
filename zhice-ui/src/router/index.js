@@ -87,6 +87,16 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
+  },
+  {
+    path:'/result',
+     component: () => import('@/views/questions/topic/result'),
+    hidden: true
+  },
+  {
+    path:'/questions/questions/topic/questions/result',
+    component: () => import('@/views/questions/topic/result'),
+    hidden: true
   }
 ]
 

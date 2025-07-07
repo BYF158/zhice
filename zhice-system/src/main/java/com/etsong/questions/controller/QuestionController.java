@@ -2,18 +2,21 @@
 package com.etsong.questions.controller;
 
 import com.etsong.common.core.domain.R;
+import com.etsong.questions.domain.AnswerDTO;
+import com.etsong.questions.domain.PersonalityScoreResponse;
+import com.etsong.questions.domain.Topic;
+import com.etsong.questions.service.QuestionService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.etsong.questions.service.QuestionService;
-import com.etsong.questions.domain.Topic;
+import java.util.List;
 
+/**
+ * 题目相关控制器
+ */
 @RestController
 @RequestMapping("/questions/topic")
 public class QuestionController {
@@ -40,4 +43,33 @@ public class QuestionController {
         
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 处理前端提交的题目数据
+     * @param answerDTO 包含所有题目的答案对象
+     * @param userId 用户ID
+     * @return 操作结果
+     */
+    @PreAuthorize("@ss.hasPermi('questions:topic:questions')")
+    @PostMapping("/submit-answers")
+    public R<?> submitAnswers(@RequestBody AnswerDTO answerDTO,
+                                @RequestParam Long userId) {
+        Integer recordId = questionService.processAndStoreAnswers(answerDTO.getAnswers(), userId);
+        if (recordId != null) {
+            return R.ok(recordId,"提交成功");
+        } else {
+            return R.fail("提交失败");
+        }
+    }
+
+    @GetMapping("/scores")
+    public R<PersonalityScoreResponse> getPersonalityScores(
+            @RequestParam("recordId") Integer recordId
+    ) {
+        PersonalityScoreResponse response = questionService.getPersonalityScores(recordId);
+        return R.ok(response, "Success");
+    }
+
+
+
 }

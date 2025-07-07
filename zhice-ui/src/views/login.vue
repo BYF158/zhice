@@ -73,8 +73,8 @@ export default {
       title: process.env.VUE_APP_TITLE,
       codeUrl: "",
       loginForm: {
-        username: "admin",
-        password: "admin123",
+        username: "",
+        password: "",
         rememberMe: false,
         code: "",
         uuid: ""
@@ -129,6 +129,8 @@ export default {
       }
     },
     handleLogin() {
+      //this.$refs是Vue.js提供的一个对象,用于直接访问DOM元素或子组件实例
+      //validate方法用于校验表单数据是否合法
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -141,6 +143,7 @@ export default {
             Cookies.remove("password")
             Cookies.remove('rememberMe')
           }
+          // 调用名为Login的action this.loginForm作为参数
           this.$store.dispatch("Login", this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{})
           }).catch(() => {

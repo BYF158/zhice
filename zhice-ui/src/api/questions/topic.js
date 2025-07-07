@@ -56,10 +56,13 @@ export function getQuestionByPage(pageNum,pageSize=6){
 }
 
 //提交答案
-export function submitAnswers(recordData) {
+export function submitAnswers(recordData,userId) {
   return request({
-    url: '/records',
+    url: '/questions/topic/submit-answers',
     method: 'post',
+    params: {
+      userId
+    },
     data: recordData
   })
 }
@@ -70,4 +73,17 @@ export function getResult(recordId) {
     url: '/records/' + recordId,
     method: 'get',
   })
+}
+
+/**
+ * 获取人格评分数据
+ * @param {number} recordId - 记录ID
+ * @param {number} userId - 用户ID
+ * @returns {Promise<any>}
+ */
+export function getPersonalityScores(recordId) {
+  return request({
+    url: `/questions/topic/scores?recordId=${recordId}`,
+    method: 'get'
+  });
 }

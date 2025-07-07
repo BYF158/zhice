@@ -1,6 +1,11 @@
 package com.etsong.framework.web.service;
 
 import javax.annotation.Resource;
+
+import com.etsong.common.core.domain.entity.SysRole;
+import com.etsong.system.domain.SysUserRole;
+import com.etsong.system.mapper.SysRoleMapper;
+import com.etsong.system.mapper.SysUserRoleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,6 +34,9 @@ import com.etsong.framework.security.context.AuthenticationContextHolder;
 import com.etsong.system.service.ISysConfigService;
 import com.etsong.system.service.ISysUserService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 登录校验方法
  * 
@@ -51,6 +59,14 @@ public class SysLoginService
 
     @Autowired
     private ISysConfigService configService;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
+
+    @Autowired
+    private SysUserRoleMapper userRoleMapper;
+
+
 
     /**
      * 登录验证
@@ -96,6 +112,24 @@ public class SysLoginService
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         recordLoginInfo(loginUser.getUserId());
+
+        // 根据id查询角色，如果角色不存在，则插入角色ID
+        Long roleId = userRoleMapper.selectRoleIdByUserId(loginUser.getUserId());
+        if (roleId == null)
+        {
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setUserId(loginUser.getUserId());
+            sysUserRole.setRoleId(101L);
+
+            List<SysUserRole> userRoleList  =new ArrayList<SysUserRole>();
+            userRoleList.add(sysUserRole);
+
+            userRoleMapper.batchUserRole(userRoleList);
+        }
+
+
+
+
         // 生成token
         return tokenService.createToken(loginUser);
     }

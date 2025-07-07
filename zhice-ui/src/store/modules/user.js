@@ -60,6 +60,7 @@ const user = {
 
     // 获取用户信息
     GetInfo({ commit, state }) {
+      console.log('GetInfo method is called'); // 添加日志输出
       return new Promise((resolve, reject) => {
         getInfo().then(res => {
           const user = res.user

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+
+import com.etsong.questions.mapper.TestRecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,9 @@ public class SysUserServiceImpl implements ISysUserService
 
     @Autowired
     private SysUserPostMapper userPostMapper;
+
+    @Autowired
+    private TestRecordMapper testRocrdMapper;
 
     @Autowired
     private ISysConfigService configService;
@@ -278,6 +283,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public boolean registerUser(SysUser user)
     {
+
         return userMapper.insertUser(user) > 0;
     }
 
@@ -546,5 +552,10 @@ public class SysUserServiceImpl implements ISysUserService
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+    @Override
+    public Integer getRecordId(Long userId) {
+        return testRocrdMapper.getRecordIdByUserId(userId);
     }
 }

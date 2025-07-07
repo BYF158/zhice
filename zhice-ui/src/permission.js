@@ -29,7 +29,20 @@ router.beforeEach((to, from, next) => {
       if (store.getters.roles.length === 0) {
         isRelogin.show = true
         // 判断当前用户是否已拉取完user_info信息
-        store.dispatch('GetInfo').then(() => {
+        store.dispatch('GetInfo').then(response => {
+
+          const userId = store.state.user.id;
+          localStorage.setItem('userId', userId);
+          const recordId = response.recordId; // 从响应体中获取 recordId
+          console.log("recordId from response:", recordId)
+
+          if (recordId) {
+            store.commit('SET_RECORDID', recordId); // 提交到 Vuex Store
+            localStorage.setItem('recordId', recordId);
+          } else {
+            console.warn("recordId 不存在于响应数据中");
+          }
+
           isRelogin.show = false
           store.dispatch('GenerateRoutes').then(accessRoutes => {
             // 根据roles权限生成可访问的路由表

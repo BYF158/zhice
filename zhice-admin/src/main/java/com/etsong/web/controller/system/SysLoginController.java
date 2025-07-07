@@ -3,6 +3,8 @@ package com.etsong.web.controller.system;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import com.etsong.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,6 +49,9 @@ public class SysLoginController
     @Autowired
     private ISysConfigService configService;
 
+    @Autowired
+    private ISysUserService userService;
+
     /**
      * 登录方法
      * 
@@ -78,6 +83,13 @@ public class SysLoginController
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(user);
+
+        //获取recordId
+        Integer recordId = userService.getRecordId(user.getUserId());
+
+        System.out.println("recordId: " +recordId);
+
+
         if (!loginUser.getPermissions().equals(permissions))
         {
             loginUser.setPermissions(permissions);
@@ -89,6 +101,7 @@ public class SysLoginController
         ajax.put("permissions", permissions);
         ajax.put("isDefaultModifyPwd", initPasswordIsModify(user.getPwdUpdateDate()));
         ajax.put("isPasswordExpired", passwordIsExpiration(user.getPwdUpdateDate()));
+        ajax.put("recordId", recordId);
         return ajax;
     }
 

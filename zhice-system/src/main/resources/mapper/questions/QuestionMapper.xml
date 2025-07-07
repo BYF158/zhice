@@ -23,5 +23,28 @@
         SELECT COUNT(*) FROM topic
     </select>
 
+    <resultMap id="prototypeScoreResultMap" type="com.etsong.questions.domain.PrototypeScore">
+        <id property="id" column="id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="prototypeId" column="prototype_id"/>
+        <result property="score" column="score"/>
+        <result property="prototypeName" column="prototype_name"/>
+    </resultMap>
+
+    <select id="selectScoresByRecordId" resultMap="prototypeScoreResultMap">
+        SELECT
+            ps.id,
+            ps.record_id,
+            ps.prototype_id,
+            ps.score,
+            p.prototype_name
+        FROM
+            prototype_score ps
+                LEFT JOIN
+            prototype p ON ps.prototype_id = p.prototype_id
+        WHERE
+            ps.record_id = #{recordId}
+    </select>
+
 </mapper>
 

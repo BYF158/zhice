@@ -112,4 +112,6 @@ public class R<T> implements Serializable
     {
         return R.SUCCESS == ret.getCode();
     }
+
+
 }

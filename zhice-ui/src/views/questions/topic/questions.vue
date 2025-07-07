@@ -93,6 +93,7 @@
     </el-row>
 
     <!-- 未完成提示弹窗 -->
+    <!--修改样式-->
     <el-dialog
       title="提示"
       :visible.sync="showAlert"
@@ -153,7 +154,7 @@ export default {
   },
   computed: {
     progress() {
-      return this.totalPages > 0 ? Math.min(100, (this.currentPage / this.totalPages) * 100) : 0;
+      return this.totalPages > 0 ? Math.min(100, Math.round((this.currentPage / this.totalPages) * 100 * 100) / 100) : 0;
     }
   },
   created() {
@@ -169,10 +170,7 @@ export default {
   this.loading = true;
   try {
     const response = await getQuestionByPage(this.currentPage, this.queryParams.pageSize);
-    console.log('接口返回:', response); // 👈 调试用
-    console.log('接口数据:', response);
 
-    console.log('接口数据:', response.list);
     const pageData = response.data;
     console.log('分页数据:', pageData); // 👈 调试用
 
@@ -243,11 +241,14 @@ export default {
         topicId: parseInt(topicId),
         score: parseInt(score)
       }));
+      const userId = localStorage.getItem("userId");
+      console.log("userId",userId);
 
-      submitAnswers({ answers: answerList })
+      submitAnswers({ answers: answerList },userId)
         .then(response => {
-          this.recordId = response.data.recordId;
+          this.recordId = response.data;
           this.showSuccess = true;
+          localStorage.setItem("recordId", response.data);
           localStorage.removeItem("testAnswers");
         })
         .catch(() => {

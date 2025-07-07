@@ -42,3 +42,5 @@ export function delPost(postId) {
     method: 'delete'
   })
 }
+
+
