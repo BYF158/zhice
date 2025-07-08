@@ -25,6 +25,23 @@ import "quill/dist/quill.snow.css"
 import "quill/dist/quill.bubble.css"
 import { getToken } from "@/utils/auth"
 
+// 引入 Quill 的基础模块
+const Block = Quill.import('blots/block');
+
+// 自定义 Block Blot，使用 <div> 替代默认的 <p>
+class CustomBlock extends Block {
+  static create(value) {
+    const node = super.create(value);
+    node.setAttribute('data-custom-block', 'true'); // 可选：用于标识自定义块
+    return node;
+  }
+}
+CustomBlock.blotName = 'customBlock';
+CustomBlock.tagName = 'div'; // 将默认的 <p> 替换为 <div>
+
+// 注册自定义 Blot
+Quill.register(CustomBlock, true);
+
 export default {
   name: "Editor",
   props: {
@@ -88,6 +105,10 @@ export default {
         },
         placeholder: "请输入内容",
         readOnly: this.readOnly,
+        // 使用自定义的 customBlock 替代默认的 block
+        formats: ['customBlock', 'bold', 'italic', 'underline', 'strike', 'blockquote',
+          'list', 'bullet', 'indent', 'size', 'header', 'color', 'background',
+          'align', 'link', 'image', 'video']
       },
     }
   },
@@ -140,12 +161,14 @@ export default {
       }
       this.Quill.clipboard.dangerouslyPasteHTML(this.currentValue)
       this.Quill.on("text-change", (delta, oldDelta, source) => {
-        const html = this.$refs.editor.children[0].innerHTML
-        const text = this.Quill.getText()
-        const quill = this.Quill
-        this.currentValue = html
-        this.$emit("input", html)
-        this.$emit("on-change", { html, text, quill })
+          const html = this.$refs.editor.children[0].innerHTML
+          // 去除外层<p>标签
+          const html1 = html.replace(/^<p>|<\/p>$/g, '');
+          const text = this.Quill.getText()
+          const quill = this.Quill
+          this.currentValue = html1
+          this.$emit("input", html1)
+          this.$emit("on-change", { html1, text, quill })
       })
       this.Quill.on("text-change", (delta, oldDelta, source) => {
         this.$emit("on-text-change", delta, oldDelta, source)
@@ -218,6 +241,7 @@ export default {
   }
 }
 </script>
+
 
 <style>
 .editor, .ql-toolbar {
