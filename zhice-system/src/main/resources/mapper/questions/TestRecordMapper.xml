@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.questions.mapper.TestRecordMapper">
+    <!-- 插入测试记录 -->
+    <insert id="insertTestRecord" parameterType="com.etsong.questions.domain.TestRecord">
+        INSERT INTO test_record (user_id, submit_time)
+        VALUES (#{userId}, #{submitTime});
+        <selectKey keyProperty="recordId" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID();
+        </selectKey>
+    </insert>
+
+    <!--根据用户ID获取最新的recordId-->
+    <select id="getRecordIdByUserId" resultType="int" parameterType="Long">
+        select record_id from test_record where user_id = #{userId} order by submit_time desc limit 1;
+    </select>
+</mapper>

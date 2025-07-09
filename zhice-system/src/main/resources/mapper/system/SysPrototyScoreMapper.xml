@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.system.mapper.SysPrototypeScoreMapper">
+
+	<!-- 结果映射 -->
+	<resultMap id="PrototypeScoreDTOResult" type="PrototypeScoreDTO">
+		<result property="recordId"      column="record_id"/>
+		<result property="userName"      column="user_name"/>
+		<result property="prototypeName" column="prototype_name"/>
+		<result property="score"        column="score"/>
+		<result property="submitTime"   column="submit_time"/>
+
+	</resultMap>
+
+	<!-- 基础查询SQL -->
+	<sql id="selectScoreDetailSql">
+		select tr.record_id, su.user_name, pr.prototype_name, ps.score, tr.submit_time from
+			prototype_score ps
+				left join prototype pr on ps.prototype_id = pr.prototype_id
+				left join test_record tr on ps.record_id = tr.record_id
+				left join sys_user su on su.user_id = tr.user_id
+
+	</sql>
+
+
+	<!-- 查询所有评分详情 -->
+	<select id="selectScoreDetails" resultMap="PrototypeScoreDTOResult">
+		<include refid="selectScoreDetailSql"/>
+	</select>
+
+	<!-- 根据条件查询评分详情 -->
+	<select id="selectScoreDetailsByCondition" parameterType="map" resultMap="PrototypeScoreDTOResult">
+		<include refid="selectScoreDetailSql"/>
+		<where>
+			<if test="userName != null and userName != ''">
+				AND su.user_name like concat('%', #{userName}, '%')
+			</if>
+
+		</where>
+		order by tr.submit_time desc
+	</select>
+
+	<select id="selectScoreDetailsByCondition2" parameterType="SysUser" resultMap="PrototypeScoreDTOResult">
+		<include refid="selectScoreDetailSql"/>
+		<where>
+			<if test="userName != null and userName != ''">
+				AND su.user_name like concat('%', #{userName}, '%')
+			</if>
+
+		</where>
+		group by su.user_name, pr.prototype_name, ps.score, tr.submit_time ,tr.record_id
+		order by tr.submit_time desc
+	</select>
+
+	<select id="selectScoreDetailsByCondition3" parameterType="PrototypeScoreDTO" resultMap="PrototypeScoreDTOResult">
+		<include refid="selectScoreDetailSql"/>
+		<where>
+			<if test="userName != null and userName != ''">
+				AND su.user_name like concat('%', #{userName}, '%')
+			</if>
+			<if test="submitTime != null">
+				AND tr.submit_time =#{submitTime}
+			</if>
+
+		</where>
+		group by su.user_name, pr.prototype_name, ps.score, tr.submit_time ,tr.record_id
+		order by tr.submit_time desc
+
+	</select>
+
+
+	<delete id="deletePrototypeScoreByIds" parameterType="Long">
+		delete from prototype_score where record_id in
+		<foreach collection="array" item="recordId" open="(" separator="," close=")">
+			#{recordId}
+		</foreach>
+	</delete>
+
+</mapper>
