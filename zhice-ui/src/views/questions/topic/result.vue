@@ -20,6 +20,12 @@
       <div class="chart-container">
         <div ref="pieChart" class="chart"></div>
       </div>
+
+      <!-- 柱状图 -->
+       <div class="chart-container">
+         <div ref="barChart" class="bar-chart"></div>
+       </div>
+
     </el-card>
 
     <!-- 返回首页按钮 -->
@@ -39,6 +45,9 @@ export default {
     return {
       scores: [],
       chartInstance: null,
+
+      barChartInstance: null,
+
       recordId: null,
       userId: null,
       total: 0,
@@ -81,9 +90,12 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.initChart();
+
+      // this.initChart();
       window.addEventListener("resize", () => {
         if (this.chartInstance) this.chartInstance.resize();
+        if (this.barChartInstance) this.barChartInstance.resize();
+
       });
     });
   },
@@ -124,6 +136,42 @@ export default {
         ]
       };
       this.chartInstance.setOption(option);
+
+      // 绘制柱状图
+      this.barChartInstance = echarts.init(this.$refs.barChart);
+      const barOption = {
+        title: {
+          text: '原型人格得分柱状图',
+          left: 'center',
+        },
+        tooltip:{
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'}
+          },
+        xAxis: {
+          type: 'category',
+          data: this.scores.map(s => s.name),
+          axisLabel: {
+            interval: 0,
+            rotate: 30
+          }
+        },
+        yAxis: {
+          type: 'value',
+          name: '得分'
+        },
+        series: [{
+          data: this.scores.map(s => s.score),
+          type: 'bar',
+          barWidth: '50%',
+          itemStyle:{
+            color:'#409eff' 
+          }
+        }],
+      };
+      this.barChartInstance.setOption(barOption);
+
     },
     /** 更新饼状图数据 */
     updateChart() {
@@ -147,6 +195,30 @@ export default {
       }
     },
 
+
+        /** 更新柱状图数据 */
+    updateBarChart() {
+      if (this.barChartInstance && this.scores.length > 0) {
+        const scoreData = this.scores.map(score => ({
+          value: score.score,
+          name: score.name
+        }));
+
+        // 更新图表配置
+        const option = {
+          series: [
+            {
+              data: scoreData
+            }
+          ]
+        };
+
+        // 使用新配置更新图表
+        this.barChartInstance.setOption(option);
+      }
+    },
+
+
     /** 获取人格评分数据 */
     getPersonalityScores() {
       // 调用API获取评分数据
@@ -158,8 +230,17 @@ export default {
         console.log("打印评分数据：",response.data.scores)
         if (response && response.data.scores) {
           this.scores = response.data.scores;
-          // 更新饼状图
+
+          // 初始化图表
+          this.$nextTick(() => {
+            this.initChart();
+            //更新柱状图
+            this.updateBarChart();
+            // 更新饼状图
           this.updateChart();
+          });
+          
+
         } else {
           this.$message.error('未能获取到评分数据');
 
@@ -224,4 +305,11 @@ h2 {
   margin: 20px auto;
   text-align: center;
 }
+
+.bar-chart {
+  width: 100%;
+  max-width: 800px;
+  height: 400px;
+}
+
 </style>
