@@ -38,7 +38,7 @@ public class CaptchaConfig {
         // 验证码文本字符间距 默认为2，改为5以提升可读性
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_SPACE, "5");
         // 图片样式 水纹com.google.code.kaptcha.impl.WaterRipple 鱼眼com.google.code.kaptcha.impl.FishEyeGimpy 阴影com.google.code.kaptcha.impl.ShadowGimpy
-        properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
+        //properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
         // 关闭干扰线
         properties.setProperty(KAPTCHA_NOISE_IMPL, "com.google.code.kaptcha.impl.NoNoise");
 
@@ -72,11 +72,11 @@ public class CaptchaConfig {
         // 验证码文本字体样式，默认包含斜体，改为Arial
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "Arial");
         // 验证码噪点颜色 默认为Color.BLACK
-        properties.setProperty(KAPTCHA_NOISE_COLOR, "black");
+        //properties.setProperty(KAPTCHA_NOISE_COLOR, "black");
         // 干扰实现类
         properties.setProperty(KAPTCHA_NOISE_IMPL, "com.google.code.kaptcha.impl.NoNoise");
         // 图片样式 水纹com.google.code.kaptcha.impl.WaterRipple 鱼眼com.google.code.kaptcha.impl.FishEyeGimpy 阴影com.google.code.kaptcha.impl.ShadowGimpy
-        properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
+        //properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
 
         Config config = new Config(properties);
         defaultKaptcha.setConfig(config);

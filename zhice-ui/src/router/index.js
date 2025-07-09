@@ -97,7 +97,13 @@ export const constantRoutes = [
     path:'/questions/questions/topic/questions/result',
     component: () => import('@/views/questions/topic/result'),
     hidden: true
+  },
+  {
+    path:'/questions',
+    component: () => import('@/views/questions/topic/questions'),
+    hidden: true
   }
+
 ]
 
 // 动态路由，基于用户权限动态去加载

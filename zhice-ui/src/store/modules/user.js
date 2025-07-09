@@ -106,6 +106,7 @@ const user = {
           commit('SET_PERMISSIONS', [])
           removeToken()
           resolve()
+          localStorage.clear()
         }).catch(error => {
           reject(error)
         })
