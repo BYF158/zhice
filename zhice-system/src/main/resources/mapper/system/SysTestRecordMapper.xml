@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.system.mapper.SysTestRecordMapper">
+
+	<!-- 结果映射 -->
+	<resultMap id="PrototypeScoreDTOResult" type="TestRecordS">
+		<result property="recordId"      column="record_id"/>
+		<result property="userId"      column="user_id"/>
+		<result property="submitTime"   column="submit_time"/>
+
+	</resultMap>
+
+	<delete id="deleteTestRecordByIds" parameterType="Long">
+
+		delete from test_record where record_id in
+		<foreach collection="array" item="recordId" open="(" separator="," close=")">
+			#{recordId}
+		</foreach>
+	</delete>
+
+	<delete id="deleteTopicAnswerByIds" parameterType="Long">
+
+		delete from topic_answer where record_id in
+		<foreach collection="array" item="recordId" open="(" separator="," close=")">
+			#{recordId}
+		</foreach>
+	</delete>
+
+	<select id="selectTestRecordByUserId" parameterType="Long" resultMap="PrototypeScoreDTOResult">
+		SELECT record_id,user_id,submit_time
+		FROM test_record
+		<where>
+			<if test="userId != null">
+				AND user_id = #{userId}
+			</if>
+		</where>
+		ORDER BY submit_time DESC
+			LIMIT 1;
+
+	</select>
+
+</mapper>
