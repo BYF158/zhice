@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.personality.mapper.PersonalityOptionsMapper">
+    <!-- 结果映射：将数据库列映射到实体类字段 -->
+    <resultMap id="PersonalityOptionResultMap" type="PersonalityOptionsVO">
+        <id property="questionNumber" column="question_number"/>
+        <result property="sOption" column="s_option"/>
+        <result property="cOption" column="c_option"/>
+        <result property="mOption" column="m_option"/>
+        <result property="pOption" column="p_option"/>
+    </resultMap>
+
+    <!-- 查询方法：获取所有问题的性格选项（按优缺点分组） -->
+    <select id="getPersonalityOptionsByQuestion" resultMap="PersonalityOptionResultMap">
+        SELECT
+        question_number,
+        MAX(CASE WHEN option_type = 'S' THEN option_text END) AS s_option,
+        MAX(CASE WHEN option_type = 'C' THEN option_text END) AS c_option,
+        MAX(CASE WHEN option_type = 'M' THEN option_text END) AS m_option,
+        MAX(CASE WHEN option_type = 'P' THEN option_text END) AS p_option
+        FROM (
+        SELECT
+        question_number,
+        option_type,
+        option_text,
+
+        CASE
+        WHEN question_number  &lt; 21 THEN 1
+        ELSE 0  -- 缺点
+        END AS is_advantage
+        FROM
+        personality_options
+        ) AS t
+        GROUP BY
+        question_number, is_advantage
+        ORDER BY
+        question_number, is_advantage desc;
+    </select>
+
+
+    <!-- 查询方法：获取所有问题的性格选项（按优缺点分组） -->
+    <select id="selectOptionDefinitionList" resultMap="PersonalityOptionResultMap">
+        SELECT
+        question_number,
+        MAX(CASE WHEN option_type = 'S' THEN option_definition END) AS s_option,
+        MAX(CASE WHEN option_type = 'C' THEN option_definition END) AS c_option,
+        MAX(CASE WHEN option_type = 'M' THEN option_definition END) AS m_option,
+        MAX(CASE WHEN option_type = 'P' THEN option_definition END) AS p_option
+        FROM (
+        SELECT
+        question_number,
+        option_type,
+        option_definition,
+        -- 根据 question_number 生成 is_advantage 逻辑
+        CASE
+        WHEN question_number &lt; 21 THEN 1  -- 优点
+        ELSE 0  -- 缺点
+        END AS is_advantage
+        FROM
+        personality_options
+        ) AS t
+        GROUP BY
+        question_number, is_advantage  -- 按问题和动态生成的优缺点分组
+        ORDER BY
+        question_number, is_advantage DESC;  -- 排序：问题编号+优缺点（优点在前）
+    </select>
+
+</mapper>

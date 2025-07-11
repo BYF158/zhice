@@ -3,7 +3,7 @@ package com.etsong.questions.controller;
 
 import com.etsong.common.core.domain.R;
 import com.etsong.questions.domain.AnswerDTO;
-import com.etsong.questions.domain.PersonalityScoreResponse;
+import com.etsong.personality.domain.PersonalityScoreResponse;
 import com.etsong.questions.domain.Topic;
 import com.etsong.questions.service.QuestionService;
 import com.github.pagehelper.PageInfo;
@@ -69,7 +69,5 @@ public class QuestionController {
         PersonalityScoreResponse response = questionService.getPersonalityScores(recordId);
         return R.ok(response, "Success");
     }
-
-
 
 }

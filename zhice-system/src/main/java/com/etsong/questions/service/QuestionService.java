@@ -1,12 +1,11 @@
 package com.etsong.questions.service;
 
 import com.etsong.questions.domain.AnswerDTO;
-import com.etsong.questions.domain.PersonalityScoreResponse;
+import com.etsong.personality.domain.PersonalityScoreResponse;
 import com.etsong.questions.domain.Topic;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 题目相关服务接口

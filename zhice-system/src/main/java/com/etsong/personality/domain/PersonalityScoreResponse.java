@@ -1,4 +1,4 @@
-package com.etsong.questions.domain;
+package com.etsong.personality.domain;
 
 
 

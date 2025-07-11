@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.system.mapper.PersonalityResultsMapper">
+    
+    <resultMap type="PersonalityResult" id="PersonalityResultsResult">
+        <result property="resultId"    column="result_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="testDate"    column="test_date"    />
+        <result property="typeSScore"    column="type_s_score"    />
+        <result property="typeMScore"    column="type_m_score"    />
+        <result property="typeCScore"    column="type_c_score"    />
+        <result property="typePScore"    column="type_p_score"    />
+    </resultMap>
+
+    <sql id="selectPersonalityResultsVo">
+        select result_id, user_id, test_date, type_s_score, type_m_score, type_c_score, type_p_score from personality_results
+    </sql>
+
+    <select id="selectPersonalityResultsList" parameterType="PersonalityResult" resultMap="PersonalityResultsResult">
+        <include refid="selectPersonalityResultsVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="testDate != null "> and test_date = #{testDate}</if>
+            <if test="typeSScore != null "> and type_s_score = #{typeSScore}</if>
+            <if test="typeMScore != null "> and type_m_score = #{typeMScore}</if>
+            <if test="typeCScore != null "> and type_c_score = #{typeCScore}</if>
+            <if test="typePScore != null "> and type_p_score = #{typePScore}</if>
+        </where>
+    </select>
+    
+    <select id="selectPersonalityResultsByResultId" parameterType="Long" resultMap="PersonalityResultsResult">
+        <include refid="selectPersonalityResultsVo"/>
+        where result_id = #{resultId}
+    </select>
+
+    <insert id="insertPersonalityResults" parameterType="PersonalityResult" useGeneratedKeys="true" keyProperty="resultId">
+        insert into personality_results
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="testDate != null">test_date,</if>
+            <if test="typeSScore != null">type_s_score,</if>
+            <if test="typeMScore != null">type_m_score,</if>
+            <if test="typeCScore != null">type_c_score,</if>
+            <if test="typePScore != null">type_p_score,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="testDate != null">#{testDate},</if>
+            <if test="typeSScore != null">#{typeSScore},</if>
+            <if test="typeMScore != null">#{typeMScore},</if>
+            <if test="typeCScore != null">#{typeCScore},</if>
+            <if test="typePScore != null">#{typePScore},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePersonalityResults" parameterType="PersonalityResult">
+        update personality_results
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="testDate != null">test_date = #{testDate},</if>
+            <if test="typeSScore != null">type_s_score = #{typeSScore},</if>
+            <if test="typeMScore != null">type_m_score = #{typeMScore},</if>
+            <if test="typeCScore != null">type_c_score = #{typeCScore},</if>
+            <if test="typePScore != null">type_p_score = #{typePScore},</if>
+        </trim>
+        where result_id = #{resultId}
+    </update>
+
+    <delete id="deletePersonalityResultsByResultId" parameterType="Long">
+        delete from personality_results where result_id = #{resultId}
+    </delete>
+
+    <delete id="deletePersonalityResultsByResultIds" parameterType="String">
+        delete from personality_results where result_id in 
+        <foreach item="resultId" collection="array" open="(" separator="," close=")">
+            #{resultId}
+        </foreach>
+    </delete>
+</mapper>

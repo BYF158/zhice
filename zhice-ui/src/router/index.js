@@ -93,16 +93,11 @@ export const constantRoutes = [
      component: () => import('@/views/questions/topic/result'),
     hidden: true
   },
-  {
-    path:'/questions/questions/topic/questions/result',
-    component: () => import('@/views/questions/topic/result'),
-    hidden: true
-  },
-  {
-    path:'/questions',
-    component: () => import('@/views/questions/topic/questions'),
-    hidden: true
-  }
+  // {
+  //   path:'/options',
+  //   component: () => import('@/views/personality/options/index'),
+  //   hidden: true
+  // }
 
 ]
 

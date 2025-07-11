@@ -1,25 +1,25 @@
 <template>
   <div class="score-wrapper">
     <el-card class="score-card" shadow="hover">
-      <h2>原型人格得分结果</h2>
+      <h2>集体原型测试结果</h2>
 
       <!-- 表格展示 -->
       <div class="score-grid">
         <el-table :data="leftScores" stripe border :show-header="false" class="score-table">
           <el-table-column prop="name" label="原型" align="center"></el-table-column>
-          <el-table-column prop="score" label="得分" width="80" align="center"></el-table-column>
+          <el-table-column prop="score" label="得分" width="40" align="center"></el-table-column>
         </el-table>
 
         <el-table :data="rightScores" stripe border :show-header="false" class="score-table">
           <el-table-column prop="name" label="原型" align="center"></el-table-column>
-          <el-table-column prop="score" label="得分" width="80" align="center"></el-table-column>
+          <el-table-column prop="score" label="得分" width="40" align="center"></el-table-column>
         </el-table>
       </div>
 
       <!-- 饼状图 -->
-      <div class="chart-container">
+      <!-- <div class="chart-container">
         <div ref="pieChart" class="chart"></div>
-      </div>
+      </div> -->
 
       <!-- 柱状图 -->
        <div class="chart-container">
@@ -101,49 +101,49 @@ export default {
   },
   methods: {
     initChart() {
-      this.chartInstance = echarts.init(this.$refs.pieChart);
-      const option = {
-        title: {
-          text: '原型人格得分比例',
-          left: 'center',
-          top: '10%'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{b}: {c} 分 ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-          data: this.scores.map(s => s.name)
-        },
-        series: [
-          {
-            name: '原型得分',
-            type: 'pie',
-            radius: '60%',
-            top: '10%',
-            center: ['50%', '50%'],
-            data: this.scores.map(s => ({ name: s.name, value: s.score })),
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
-          }
-        ]
-      };
-      this.chartInstance.setOption(option);
+      // this.chartInstance = echarts.init(this.$refs.pieChart);
+      // const option = {
+      //   title: {
+      //     text: '原型人格得分比例',
+      //     left: 'center',
+      //     top: '10%'
+      //   },
+      //   tooltip: {
+      //     trigger: 'item',
+      //     formatter: '{b}: {c} 分 ({d}%)'
+      //   },
+      //   legend: {
+      //     orient: 'vertical',
+      //     left: 'left',
+      //     data: this.scores.map(s => s.name)
+      //   },
+      //   series: [
+      //     {
+      //       name: '原型得分',
+      //       type: 'pie',
+      //       radius: '60%',
+      //       top: '10%',
+      //       center: ['50%', '50%'],
+      //       data: this.scores.map(s => ({ name: s.name, value: s.score })),
+      //       emphasis: {
+      //         itemStyle: {
+      //           shadowBlur: 10,
+      //           shadowOffsetX: 0,
+      //           shadowColor: 'rgba(0, 0, 0, 0.5)'
+      //         }
+      //       }
+      //     }
+      //   ]
+      // };
+      // this.chartInstance.setOption(option);
 
       // 绘制柱状图
       this.barChartInstance = echarts.init(this.$refs.barChart);
       const barOption = {
-        title: {
-          text: '原型人格得分柱状图',
-          left: 'center',
-        },
+        // title: {
+        //   text: '集体原型测试结果',
+        //   left: 'center',
+        // },
         tooltip:{
           trigger: 'axis',
           axisPointer: {
@@ -166,7 +166,12 @@ export default {
           type: 'bar',
           barWidth: '50%',
           itemStyle:{
-            color:'#409eff' 
+            color:'#409eff'
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}'
           }
         }],
       };
@@ -208,7 +213,12 @@ export default {
         const option = {
           series: [
             {
-              data: scoreData
+              data: scoreData,
+              label: {
+                show: true,
+                position: 'top',
+                formatter: '{c}'
+              }
             }
           ]
         };
@@ -239,7 +249,7 @@ export default {
             // 更新饼状图
           this.updateChart();
           });
-          
+
 
         } else {
           this.$message.error('未能获取到评分数据');
@@ -278,14 +288,15 @@ export default {
   padding: 20px;
 }
 h2 {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   text-align: center;
 }
 .score-grid {
+  width: 50%;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   gap: 20px;
-  margin-bottom: 30px;
+  margin: 0 auto 30px;
 }
 .score-table {
   width: 45%;

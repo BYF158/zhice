@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.personality.mapper.PersonalityResultMapper">
+
+
+
+
+    <insert id="save" parameterType="PersonalityResults" useGeneratedKeys="true" keyProperty="resultId">
+        INSERT INTO personality_results
+        (user_id, test_date, type_s_score, type_m_score, type_c_score, type_p_score)
+        VALUES
+            (#{userId}, #{testDate}, #{typeSScore}, #{typeMScore}, #{typeCScore}, #{typePScore})
+    </insert>
+
+</mapper>

@@ -1,5 +1,6 @@
 package com.etsong.questions.service.impl;
 
+import com.etsong.personality.domain.PersonalityScoreResponse;
 import com.etsong.questions.domain.*;
 import com.etsong.questions.mapper.*;
 import com.etsong.questions.service.QuestionService;
@@ -11,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
