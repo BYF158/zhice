@@ -528,7 +528,7 @@ export default {
       this.disadvantageAnswers.forEach(answer => {
         if (answer) {
           const category = answer.charAt(0);
-          this.resultTypes[category].disadvantageScore -= 1; // 缺点每项减1分
+          this.resultTypes[category].disadvantageScore += 1; // 缺点每项减1分
         }
       });
 

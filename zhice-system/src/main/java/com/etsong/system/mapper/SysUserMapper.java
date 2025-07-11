@@ -124,4 +124,7 @@ public interface SysUserMapper
      * @return 结果
      */
     public SysUser checkEmailUnique(String email);
+
+    // 获取用户名
+    String selectUserNameById(Long userId);
 }

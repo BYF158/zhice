@@ -62,6 +62,7 @@ public class QuestionController {
         }
     }
 
+    @PreAuthorize("@ss.hasPermi('questions:topic:questions')")
     @GetMapping("/scores")
     public R<PersonalityScoreResponse> getPersonalityScores(
             @RequestParam("recordId") Integer recordId

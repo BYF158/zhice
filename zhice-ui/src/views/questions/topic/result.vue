@@ -85,7 +85,7 @@ export default {
       this.getPersonalityScores();
     }else{
       this.$message.error('请先完成答题');
-      this.$router.push('/questions');
+      this.$router.push('/questions/topic');
     }
   },
   mounted() {

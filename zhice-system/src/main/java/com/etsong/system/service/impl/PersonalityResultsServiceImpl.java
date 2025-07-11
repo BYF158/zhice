@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import com.etsong.system.mapper.PersonalityResultsMapper;
 import com.etsong.system.domain.PersonalityResult;
 import com.etsong.system.service.IPersonalityResultsService;
+import com.etsong.system.mapper.SysUserMapper;
+import com.etsong.common.core.domain.entity.SysUser;
+
 
 /**
  * 得分管理Service业务层处理
@@ -18,6 +21,9 @@ public class PersonalityResultsServiceImpl implements IPersonalityResultsService
 {
     @Autowired
     private PersonalityResultsMapper personalityResultsMapper;
+
+    @Autowired
+    private SysUserMapper userMapper;
 
     /**
      * 查询得分管理
@@ -40,7 +46,16 @@ public class PersonalityResultsServiceImpl implements IPersonalityResultsService
     @Override
     public List<PersonalityResult> selectPersonalityResultsList(PersonalityResult personalityResult)
     {
-        return personalityResultsMapper.selectPersonalityResultsList(personalityResult);
+        // 根据用户ID添加用户名
+        List<PersonalityResult> listResult = personalityResultsMapper.selectPersonalityResultsList(personalityResult);
+        for (PersonalityResult result : listResult) {
+            String userId = result.getUserId().toString();
+            String userName = userMapper.selectUserNameById(Long.valueOf(userId));
+            if (userName != null) {
+                result.setUserName(userName);
+            }
+        }
+        return listResult;
     }
 
     /**

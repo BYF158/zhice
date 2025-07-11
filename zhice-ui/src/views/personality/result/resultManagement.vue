@@ -54,7 +54,7 @@
     <el-table v-loading="loading" :data="personalityList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="结果ID" align="center" prop="resultId" />
-      <el-table-column label="用户ID" align="center" prop="userId" />
+      <el-table-column label="用户姓名" align="center" prop="userName" />
 
       <el-table-column label="S(活泼型)" align="center" prop="typeSScore" />
       <el-table-column label="M(完美型)" align="center" prop="typeMScore" />

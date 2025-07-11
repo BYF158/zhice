@@ -2,6 +2,8 @@ package com.etsong.system.domain;
 
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.etsong.common.annotation.Excel;
@@ -13,6 +15,8 @@ import com.etsong.common.core.domain.BaseEntity;
  * @author ruoyi
  * @date 2025-07-10
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class PersonalityResult extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -23,6 +27,10 @@ public class PersonalityResult extends BaseEntity
     /** 用户ID */
     @Excel(name = "用户ID")
     private Long userId;
+
+    /** 用户姓名 */
+    @Excel(name = "用户姓名")
+    private String userName;
 
     /** 测试时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -45,75 +53,7 @@ public class PersonalityResult extends BaseEntity
     @Excel(name = "P(和平型)分数")
     private Long typePScore;
 
-    public void setResultId(Long resultId) 
-    {
-        this.resultId = resultId;
-    }
 
-    public Long getResultId() 
-    {
-        return resultId;
-    }
-
-    public void setUserId(Long userId) 
-    {
-        this.userId = userId;
-    }
-
-    public Long getUserId() 
-    {
-        return userId;
-    }
-
-    public void setTestDate(Date testDate) 
-    {
-        this.testDate = testDate;
-    }
-
-    public Date getTestDate() 
-    {
-        return testDate;
-    }
-
-    public void setTypeSScore(Long typeSScore) 
-    {
-        this.typeSScore = typeSScore;
-    }
-
-    public Long getTypeSScore() 
-    {
-        return typeSScore;
-    }
-
-    public void setTypeMScore(Long typeMScore) 
-    {
-        this.typeMScore = typeMScore;
-    }
-
-    public Long getTypeMScore() 
-    {
-        return typeMScore;
-    }
-
-    public void setTypeCScore(Long typeCScore) 
-    {
-        this.typeCScore = typeCScore;
-    }
-
-    public Long getTypeCScore() 
-    {
-        return typeCScore;
-    }
-
-    public void setTypePScore(Long typePScore) 
-    {
-        this.typePScore = typePScore;
-    }
-
-    public Long getTypePScore() 
-    {
-        return typePScore;
-    }
 
     @Override
     public String toString() {

@@ -88,11 +88,11 @@ export const constantRoutes = [
       }
     ]
   },
-  {
-    path:'/result',
-     component: () => import('@/views/questions/topic/result'),
-    hidden: true
-  },
+  // {
+  //   path:'/result',
+  //    component: () => import('@/views/questions/topic/result'),
+  //   hidden: true
+  // },
   // {
   //   path:'/options',
   //   component: () => import('@/views/personality/options/index'),
