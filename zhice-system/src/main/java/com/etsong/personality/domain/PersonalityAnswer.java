@@ -7,8 +7,8 @@ public class PersonalityAnswer {
 
     private Long id;
 
-
     private Long recordId;
 
     private Long optionId;
+
 }

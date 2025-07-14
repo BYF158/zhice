@@ -1,7 +1,7 @@
 package com.etsong.questions.service;
 
-import com.etsong.questions.domain.AnswerDTO;
 import com.etsong.personality.domain.PersonalityScoreResponse;
+import com.etsong.questions.domain.AnswerDTO;
 import com.etsong.questions.domain.Topic;
 import com.github.pagehelper.PageInfo;
 

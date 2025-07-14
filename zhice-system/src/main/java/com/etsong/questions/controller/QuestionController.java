@@ -3,7 +3,7 @@ package com.etsong.questions.controller;
 
 import com.etsong.common.core.domain.R;
 import com.etsong.questions.domain.AnswerDTO;
-import com.etsong.personality.domain.PersonalityScoreResponse;
+
 import com.etsong.questions.domain.Topic;
 import com.etsong.questions.service.QuestionService;
 import com.github.pagehelper.PageInfo;
@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import com.etsong.personality.domain.PersonalityScoreResponse;
 
 /**
  * 题目相关控制器

@@ -7,10 +7,7 @@ import com.etsong.personality.domain.PersonalityResults;
 import com.etsong.personality.service.IPersonalityRecordService;
 import com.etsong.personality.service.IPersonalityResultService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -49,6 +46,14 @@ public class PersonalityResultController extends BaseController {
 
         return R.ok(result.getResultId(),"保存成功");
 
+    }
+
+    //获取用户最近一次测试结果
+    @PostMapping("/getLatestResult")
+    public R<PersonalityResults> getLatestResult(@RequestParam Long userId) {
+        PersonalityResults result = personalityResultService.getLatestResult(userId);
+        System.out.println(result);
+        return R.ok(result, "查询成功");
     }
 
 

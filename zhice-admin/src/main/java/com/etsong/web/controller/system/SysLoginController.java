@@ -87,9 +87,6 @@ public class SysLoginController
         //获取recordId
         Integer recordId = userService.getRecordId(user.getUserId());
 
-        System.out.println("recordId: " +recordId);
-
-
         if (!loginUser.getPermissions().equals(permissions))
         {
             loginUser.setPermissions(permissions);

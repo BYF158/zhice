@@ -16,4 +16,5 @@ public interface IPersonalityResultService
     Integer save(PersonalityResults results);
 
 
+    PersonalityResults getLatestResult(Long userId);
 }

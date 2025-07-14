@@ -42,3 +42,20 @@ export function delPersonality(resultId) {
     method: 'delete'
   })
 }
+
+// //获取用户最新一次测试结果
+// export function getLastPersonality(params) {
+//   return request({
+//     url: '/personality/results/getLatestResult',
+//     method: 'post',
+//     data: params
+//   });
+// }
+
+export function getLastPersonality(params) {
+  return request({
+    url: `/personality/results/getLatestResult?userId=${params.userId}`,
+    method: 'post'
+  });
+}
+

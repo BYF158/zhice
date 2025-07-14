@@ -13,4 +13,7 @@ public interface PersonalityResultMapper
 
 
     int save(PersonalityResults results);
+
+    //获取用户最近一次测试结果
+    PersonalityResults getLatestResult(Long userId);
 }

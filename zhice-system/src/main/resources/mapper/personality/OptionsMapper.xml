@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.personality.mapper.OptionsMapper">
+    
+    <resultMap type="Options" id="OptionsResult">
+        <result property="optionId"    column="option_id"    />
+        <result property="optionText"    column="option_text"    />
+        <result property="optionType"    column="option_type"    />
+        <result property="optionDefinition"    column="option_definition"    />
+        <result property="questionNumber"    column="question_number"    />
+    </resultMap>
+
+    <sql id="selectPersonalityOptionsVo">
+        select option_id, option_text, option_type, option_definition, question_number from personality_options
+    </sql>
+
+    <select id="selectPersonalityOptionsList" parameterType="Options" resultMap="OptionsResult">
+        <include refid="selectPersonalityOptionsVo"/>
+        <where>  
+            <if test="optionText != null  and optionText != ''"> and option_text = #{optionText}</if>
+            <if test="optionType != null  and optionType != ''"> and option_type = #{optionType}</if>
+            <if test="optionDefinition != null  and optionDefinition != ''"> and option_definition = #{optionDefinition}</if>
+            <if test="questionNumber != null "> and question_number = #{questionNumber}</if>
+        </where>
+    </select>
+    
+    <select id="selectPersonalityOptionsByOptionId" parameterType="Long" resultMap="OptionsResult">
+        <include refid="selectPersonalityOptionsVo"/>
+        where option_id = #{optionId}
+    </select>
+
+    <insert id="insertPersonalityOptions" parameterType="Options" useGeneratedKeys="true" keyProperty="optionId">
+        insert into personality_options
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="optionText != null and optionText != ''">option_text,</if>
+            <if test="optionType != null and optionType != ''">option_type,</if>
+            <if test="optionDefinition != null">option_definition,</if>
+            <if test="questionNumber != null">question_number,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="optionText != null and optionText != ''">#{optionText},</if>
+            <if test="optionType != null and optionType != ''">#{optionType},</if>
+            <if test="optionDefinition != null">#{optionDefinition},</if>
+            <if test="questionNumber != null">#{questionNumber},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePersonalityOptions" parameterType="Options">
+        update personality_options
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="optionText != null and optionText != ''">option_text = #{optionText},</if>
+            <if test="optionType != null and optionType != ''">option_type = #{optionType},</if>
+            <if test="optionDefinition != null">option_definition = #{optionDefinition},</if>
+            <if test="questionNumber != null">question_number = #{questionNumber},</if>
+        </trim>
+        where option_id = #{optionId}
+    </update>
+
+    <delete id="deletePersonalityOptionsByOptionId" parameterType="Long">
+        delete from personality_options where option_id = #{optionId}
+    </delete>
+
+    <delete id="deletePersonalityOptionsByOptionIds" parameterType="String">
+        delete from personality_options where option_id in 
+        <foreach item="optionId" collection="array" open="(" separator="," close=")">
+            #{optionId}
+        </foreach>
+    </delete>
+</mapper>

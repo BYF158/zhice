@@ -9,8 +9,8 @@ import java.util.Date;
 
 public class PersonalityRecord {
 
-
     private Long recordId;
     private Long userId;
     private Date testTime;
+
 }
