@@ -251,7 +251,7 @@
             background: white;
             border: 1px solid #e5e5e5;
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 12px 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
@@ -264,6 +264,151 @@
             display: flex;
             align-items: flex-end;
             gap: 12px;
+        }
+
+        /* 按钮工具栏 */
+        .input-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            max-width: 300px;
+        }
+
+        .file-preview .file-icon {
+            font-size: 18px;
+        }
+
+        .file-preview .file-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .file-preview .file-size {
+            color: #999;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .file-preview .remove-file {
+            cursor: pointer;
+            color: #999;
+            padding: 2px;
+        }
+
+        .file-preview .remove-file:hover {
+            color: #ef4444;
+        }
+
+        /* 消息中的文件/图片 */
+        .message-file {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .message.user .message-file {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .message-file img.thumbnail {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .message-file img.thumbnail:hover {
+            opacity: 0.85;
+        }
+
+        .message-file .file-icon-big {
+            font-size: 32px;
+        }
+
+        .message-file .file-info {
+            flex: 1;
+        }
+
+        .message-file .file-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .message-file .file-download {
+            font-size: 12px;
+            color: #10a37f;
+            text-decoration: none;
+        }
+
+        .message-file .file-download:hover {
+            text-decoration: underline;
+        }
+
+        /* 图片预览模态框 */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
         }
 
         .input-field {
@@ -605,9 +750,22 @@
                         </svg>
                     </button>
                 </div>
+                <div class="input-toolbar">
+                    <button class="toolbar-btn" onclick="document.getElementById('fileInput').click()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                        上传文件
+                    </button>
+                    <div id="filePreviewArea"></div>
+                </div>
             </div>
+            <input type="file" id="fileInput" style="display:none" multiple onchange="handleFileSelect(event)">
             <p class="input-hint">小核AI可能生成不准确的信息，请核实重要内容。</p>
         </div>
+
+    <!-- 图片预览模态框 -->
+    <div class="image-modal" id="imageModal" onclick="closeImagePreview()">
+        <img id="previewImage" src="" alt="预览">
+    </div>
     </div>
 
     <script>
@@ -718,24 +876,50 @@
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const content = input.value.trim();
+            const hasFiles = pendingFiles.length > 0;
             
-            if (!content || !isConnected) return;
+            if ((!content && !hasFiles) || !isConnected) return;
             
             const chat = getCurrentChat();
             if (!chat) return;
             
+            // 构建用户消息（含文件信息）
+            let messageContent = content;
+            let files = [];
+            
+            if (hasFiles) {
+                // 读取文件内容（小文件直接包含）
+                for (const file of pendingFiles) {
+                    const base64 = await fileToBase64(file);
+                    files.push({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        data: base64
+                    });
+                }
+                
+                if (content) {
+                    messageContent = content;
+                } else {
+                    messageContent = `[已上传 ${files.length} 个文件]`;
+                }
+            }
+            
             // 添加用户消息
             const userMessage = {
                 role: 'user',
-                content: content,
+                content: messageContent,
+                files: files,
                 timestamp: new Date().toISOString()
             };
             
             chat.messages.push(userMessage);
             
             // 更新聊天标题
+            const titleText = content || (files[0] && '📎 ' + files[0].name) || '新对话';
             if (chat.messages.filter(m => m.role === 'user').length === 1) {
-                chat.title = content.substring(0, 20) || '新对话';
+                chat.title = titleText.substring(0, 20) || '新对话';
             }
             
             chat.updatedAt = new Date().toISOString();
@@ -746,6 +930,8 @@
             // 清空输入
             input.value = '';
             input.style.height = 'auto';
+            pendingFiles = [];
+            renderFilePreview();
             updateSendButton();
             
             // 发送到服务器
@@ -758,8 +944,9 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: content,
-                        session_id: chat.id
+                        message: messageContent,
+                        session_id: chat.id,
+                        files: files
                     })
                 });
                 
@@ -847,6 +1034,7 @@
                     <div class="message ${msg.role}">
                         <div class="message-avatar">${isUser ? '👤' : '⚛️'}</div>
                         <div class="message-content">
+                            ${renderMessageFiles(msg)}
                             <p>${escapeHtml(msg.content)}</p>
                             <div class="message-time">${time}</div>
                         </div>
@@ -856,6 +1044,41 @@
             
             // 滚动到底部
             container.scrollTop = container.scrollHeight;
+        }
+
+        function renderMessageFiles(msg) {
+            if (!msg.files || msg.files.length === 0) return '';
+            
+            return msg.files.map(f => {
+                const isImage = f.type && f.type.startsWith('image/');
+                const dataUrl = `data:${f.type};base64,${f.data}`;
+                
+                if (isImage) {
+                    return `<div class="message-file"><img class="thumbnail" src="${dataUrl}" alt="${escapeHtml(f.name)}" onclick="openImagePreview('${dataUrl}')"></div>`;
+                }
+                
+                return `
+                    <div class="message-file">
+                        <span class="file-icon-big">${getFileIcon(f.name)}</span>
+                        <div class="file-info">
+                            <div class="file-name">${escapeHtml(f.name)}</div>
+                            <div class="file-download">${formatFileSize(f.size)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
         }
         
         // 工具函数
@@ -869,7 +1092,7 @@
             const input = document.getElementById('messageInput');
             const btn = document.getElementById('sendBtn');
             
-            if (input.value.trim().length > 0) {
+            if (input.value.trim().length > 0 || pendingFiles.length > 0) {
                 btn.classList.add('active');
             } else {
                 btn.classList.remove('active');
@@ -1006,7 +1229,72 @@
             
             return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
         }
-        
+
+        // ========== 文件上传 ==========
+
+        let pendingFiles = [];
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            pendingFiles = files;
+            renderFilePreview();
+            // 自动增高输入框
+            autoResize(document.getElementById('messageInput'));
+        }
+
+        function renderFilePreview() {
+            const area = document.getElementById('filePreviewArea');
+            if (pendingFiles.length === 0) {
+                area.innerHTML = '';
+                return;
+            }
+            area.innerHTML = pendingFiles.map((f, i) => {
+                const size = formatFileSize(f.size);
+                return `
+                    <div class="file-preview">
+                        <span class="file-icon">${getFileIcon(f.name)}</span>
+                        <span class="file-name">${escapeHtml(f.name)}</span>
+                        <span class="file-size">${size}</span>
+                        <span class="remove-file" onclick="removeFile(${i})">✕</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeFile(index) {
+            pendingFiles.splice(index, 1);
+            renderFilePreview();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + 'B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + 'KB';
+            return (bytes / 1048576).toFixed(1) + 'MB';
+        }
+
+        function getFileIcon(name) {
+            const ext = name.split('.').pop().toLowerCase();
+            if (['jpg','jpeg','png','gif','webp','bmp','svg'].includes(ext)) return '🖼️';
+            if (['pdf'].includes(ext)) return '📕';
+            if (['doc','docx'].includes(ext)) return '📄';
+            if (['xls','xlsx','csv'].includes(ext)) return '📊';
+            if (['zip','rar','7z','tar','gz'].includes(ext)) return '📦';
+            if (['py','js','ts','java','go','rs','c','cpp','h','html','css','json','xml','yaml','yml'].includes(ext)) return '💻';
+            return '📎';
+        }
+
+        function openImagePreview(src) {
+            const modal = document.getElementById('imageModal');
+            const img = document.getElementById('previewImage');
+            img.src = src;
+            modal.classList.add('active');
+        }
+
+        function closeImagePreview() {
+            document.getElementById('imageModal').classList.remove('active');
+            document.getElementById('previewImage').src = '';
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;

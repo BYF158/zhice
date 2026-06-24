@@ -46,23 +46,41 @@ def chat():
         data = request.get_json()
         message = data.get('message', '').strip()
         session_id = data.get('session_id', '')
+        files = data.get('files', [])
 
-        if not message:
-            return jsonify({'error': 'message is required'}), 400
         if not session_id:
             return jsonify({'error': 'session_id is required'}), 400
 
-        # 保存用户消息
+        # 如果有文件，在消息中添加文件信息
+        file_info = ""
+        if files:
+            file_list = []
+            for f in files:
+                name = f.get('name', '未知文件')
+                ftype = f.get('type', '')
+                size = f.get('size', 0)
+                file_list.append(f"{name} ({_format_size(size)})")
+            file_info = "\n[用户上传了文件: " + ", ".join(file_list) + "]\n"
+
+        full_message = file_info + message if message else file_info.strip()
+
+        if not full_message:
+            return jsonify({'error': 'message or files required'}), 400
+
+        # 保存用户消息（含文件信息）
+        user_msg = {
+            "role": "user",
+            "content": full_message,
+            "timestamp": datetime.now().isoformat()
+        }
+        if files:
+            user_msg["files"] = [{"name": f["name"], "type": f.get("type", ""), "size": f.get("size", 0)} for f in files]
         if session_id not in sessions:
             sessions[session_id] = []
-        sessions[session_id].append({
-            "role": "user",
-            "content": message,
-            "timestamp": datetime.now().isoformat()
-        })
+        sessions[session_id].append(user_msg)
 
         # 调用OpenClaw获取回复
-        reply = call_openclaw(message, session_id)
+        reply = call_openclaw(full_message, session_id)
 
         # 保存AI回复
         ai_msg = {
@@ -166,6 +184,19 @@ def _extract_text(data, fallback):
             if result:
                 return result
     return fallback
+
+
+def _format_size(size):
+    """格式化文件大小"""
+    if not size:
+        return "0B"
+    size = int(size)
+    if size < 1024:
+        return f"{size}B"
+    elif size < 1048576:
+        return f"{size/1024:.1f}KB"
+    else:
+        return f"{size/1048576:.1f}MB"
 
 
 if __name__ == "__main__":
