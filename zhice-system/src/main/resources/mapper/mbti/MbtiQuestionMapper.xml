@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.mbti.mapper.MbtiQuestionMapper">
+
+    <resultMap type="com.etsong.mbti.domain.MbtiQuestion" id="MbtiQuestionResult">
+        <id     property="questionId"   column="question_id"    />
+        <result property="questionNo"   column="question_no"    />
+        <result property="dimension"    column="dimension"      />
+        <result property="content"      column="content"        />
+        <result property="optionA"      column="option_a"       />
+        <result property="optionAPole"  column="option_a_pole"  />
+        <result property="optionB"      column="option_b"       />
+        <result property="optionBPole"  column="option_b_pole"  />
+        <result property="status"       column="status"         />
+        <result property="createTime"   column="create_time"    />
+    </resultMap>
+
+    <sql id="selectMbtiQuestionVo">
+        select question_id, question_no, dimension, content, option_a, option_a_pole,
+               option_b, option_b_pole, status, create_time
+        from mbti_questions
+    </sql>
+
+    <select id="selectMbtiQuestionList" parameterType="com.etsong.mbti.domain.MbtiQuestion" resultMap="MbtiQuestionResult">
+        <include refid="selectMbtiQuestionVo"/>
+        <where>
+            <if test="dimension != null and dimension != ''"> and dimension = #{dimension}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+        </where>
+        order by question_no asc
+    </select>
+
+    <select id="selectMbtiQuestionById" parameterType="Long" resultMap="MbtiQuestionResult">
+        <include refid="selectMbtiQuestionVo"/>
+        where question_id = #{questionId}
+    </select>
+
+    <update id="updateMbtiQuestion" parameterType="com.etsong.mbti.domain.MbtiQuestion">
+        update mbti_questions
+        <set>
+            <if test="questionNo != null">question_no = #{questionNo},</if>
+            <if test="dimension != null and dimension != ''">dimension = #{dimension},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="optionA != null">option_a = #{optionA},</if>
+            <if test="optionAPole != null and optionAPole != ''">option_a_pole = #{optionAPole},</if>
+            <if test="optionB != null">option_b = #{optionB},</if>
+            <if test="optionBPole != null and optionBPole != ''">option_b_pole = #{optionBPole},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+        </set>
+        where question_id = #{questionId}
+    </update>
+
+    <delete id="deleteMbtiQuestionById" parameterType="Long">
+        delete from mbti_questions where question_id = #{questionId}
+    </delete>
+</mapper>

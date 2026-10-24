@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.mbti.mapper.MbtiTypeMapper">
+
+    <resultMap type="com.etsong.mbti.domain.MbtiType" id="MbtiTypeResult">
+        <id     property="typeCode"       column="type_code"       />
+        <result property="typeName"       column="type_name"       />
+        <result property="nickName"       column="nick_name"       />
+        <result property="groupName"      column="group_name"      />
+        <result property="color"          column="color"           />
+        <result property="summary"        column="summary"         />
+        <result property="description"    column="description"     />
+        <result property="strengths"      column="strengths"       />
+        <result property="weaknesses"     column="weaknesses"      />
+        <result property="careers"        column="careers"         />
+        <result property="relationships"  column="relationships"   />
+        <result property="famous"         column="famous"          />
+    </resultMap>
+
+    <sql id="selectMbtiTypeVo">
+        select type_code, type_name, nick_name, group_name, color, summary, description,
+               strengths, weaknesses, careers, relationships, famous
+        from mbti_types
+    </sql>
+
+    <select id="selectMbtiTypeList" parameterType="com.etsong.mbti.domain.MbtiType" resultMap="MbtiTypeResult">
+        <include refid="selectMbtiTypeVo"/>
+        <where>
+            <if test="groupName != null and groupName != ''"> and group_name = #{groupName}</if>
+        </where>
+        order by type_code asc
+    </select>
+
+    <select id="selectMbtiTypeByCode" parameterType="String" resultMap="MbtiTypeResult">
+        <include refid="selectMbtiTypeVo"/>
+        where type_code = #{typeCode}
+    </select>
+</mapper>

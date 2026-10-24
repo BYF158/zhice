@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etsong.mbti.mapper.MbtiAnswerMapper">
+
+    <resultMap type="com.etsong.mbti.domain.MbtiAnswer" id="MbtiAnswerResult">
+        <id     property="id"          column="id"          />
+        <result property="recordId"    column="record_id"   />
+        <result property="questionId"  column="question_id" />
+        <result property="choice"      column="choice"      />
+    </resultMap>
+
+    <insert id="batchInsertMbtiAnswer" parameterType="java.util.List">
+        insert into mbti_answers (record_id, question_id, choice) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.recordId}, #{item.questionId}, #{item.choice})
+        </foreach>
+    </insert>
+
+    <select id="selectMbtiAnswerByRecordId" parameterType="Long" resultMap="MbtiAnswerResult">
+        select id, record_id, question_id, choice from mbti_answers where record_id = #{recordId}
+    </select>
+</mapper>
